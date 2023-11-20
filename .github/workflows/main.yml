@@ -4,7 +4,55 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+    # Run workflow on on demand through UI
+  workflow_dispatch:
+    inputs:
+      product_name:
+        description: 'Product build target name'
+        required: false
+        default: 'All'
+        type: choice
+        options:
+        - All
+        - V3
+        - PanV3
+        - PanV2
+        - V3Pro
+        - OwlV3
+        - OwlPanV2
+      run_tests:
+        description: 'Run unit tests?'
+        required: false
+        default: true
+        type: boolean
+      wyzecam_sdk_submodule_hash:
+        description: 'wyzecam_sdk commit hash'
+        required: false
+        type: JSON
+        default: ''
+      wyze_utils_submodule_hash:
+        description: 'wyze_utils commit hash'
+        required: false
+        type: JSON
+        default: ''
 
 jobs:
-  check_file:
-    run: sudo apt-get -qq install cppcheck
+  build:
+    # Run on hosted VM provided by GitHub
+    runs-on: ubuntu-20.04
+    
+    steps:
+    # Checkout the source code for this repo, recusively pulling in submodules
+    - uses: actions/checkout@v2
+    
+    # Install system packages needed to build
+    - name: Install tools
+      run: |
+        sudo apt-get -qq install cppcheck
+
+    #check the source code
+    - name: static check source code
+      run: |
+        # Get the version number from the built app.ver file
+        cppcheck ./ 2> err.txt
+        echo "check ok!"
