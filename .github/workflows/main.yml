@@ -54,5 +54,5 @@ jobs:
     - name: static check source code
       run: |
         # Get the version number from the built app.ver file
-        cppcheck ./ --enable=all --xml-version=2 --output-file=result.xml
+        cppcheck ./ --enable=all --xml-version=2
         echo "check ok!"
