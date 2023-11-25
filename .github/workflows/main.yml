@@ -62,9 +62,9 @@ jobs:
         git branch -a  
         
     - name: cppcheck full
-        echo "check all!"
       if: ${{ github.event_name != 'workflow_dispatch' || ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Full')) }}
       run: |  
+        echo "It is check all!"
         if ${{ inputs.my_boolean_input == 'true' }}; then
           echo "my_boolean_input is true"
         else
@@ -100,9 +100,9 @@ jobs:
 
         # only check the different files
     - name: cppcheck different
-        echo "check different!"
       if: ${{ (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Different') }}
       run: |  
+        echo "It is check different!"        
         changed_files=$(git diff --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
         echo "$changed_files"
         if [ -n "$changed_files" ];then
