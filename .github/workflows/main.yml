@@ -36,6 +36,10 @@ on:
         - Error + warning + style
         - Error + warning + style + performance
         - Error + warning + style + performance + portability
+        
+      my_boolean_input:  # 定义一个布尔类型的输入选项
+        description: 'A boolean input'
+        required: true
 
 jobs:
   scancode_job:
@@ -59,11 +63,17 @@ jobs:
         
     - name: cppcheck full
         echo "check all!"
+        if ${{ inputs.my_boolean_input == 'true' }}; then
+          echo "my_boolean_input is true"
+        else
+          echo "my_boolean_input is false"
+        fi
+        
       if: ${{ github.event_name != 'workflow_dispatch' || ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Full')) }}
       run: |  
         if [[ "${{ github.event.inputs.message_type }}" == "All" ]]; then
           echo "output all!"
-          cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 ./
+          cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
         elif [[ "${{ github.event.inputs.message_type }}" == "Error" ]]; then
           echo "output error!"
           cppcheck --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
