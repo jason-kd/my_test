@@ -63,14 +63,14 @@ jobs:
         
     - name: cppcheck full
         echo "check all!"
+      if: ${{ github.event_name != 'workflow_dispatch' || ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Full')) }}
+      run: |  
         if ${{ inputs.my_boolean_input == 'true' }}; then
           echo "my_boolean_input is true"
         else
           echo "my_boolean_input is false"
         fi
         
-      if: ${{ github.event_name != 'workflow_dispatch' || ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Full')) }}
-      run: |  
         if [[ "${{ github.event.inputs.message_type }}" == "All" ]]; then
           echo "output all!"
           cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
