@@ -77,7 +77,7 @@ jobs:
         your_variable="${{ github.event.inputs.my_boolean_input }}"
         if [[ "$your_variable" == "true" ]]; then
           echo "my_boolean_input is true"
-          cppcheck_param+=",warning"
+          cppcheck_param+="warning"
         else
           echo "my_boolean_input is false"
         fi
