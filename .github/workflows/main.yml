@@ -39,7 +39,8 @@ on:
         
       my_boolean_input:  # 定义一个布尔类型的输入选项
         description: 'A boolean input'
-        required: true
+        required: false
+        type: boolean
 
 jobs:
   scancode_job:
