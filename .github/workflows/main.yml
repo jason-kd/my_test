@@ -97,7 +97,7 @@ jobs:
           #cppcheck --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
           #cppcheck $cppcheck_param --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
           #cppcheck --enable=style --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
-          cppcheck --enable=style --inline-suppr --force --xml-version=2 --output-file=result.xml --exitcode-suppressions=  --error-exitcode=1 ./          
+          cppcheck --enable=style --inline-suppr --force --xml-version=2 --output-file=result.xml --exitcode-suppressions=err.xml --error-exitcode=1 ./          
         elif [[ "${{ github.event.inputs.message_type }}" == "Error" ]]; then
           echo "output error!"
           cppcheck --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
