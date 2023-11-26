@@ -67,7 +67,8 @@ jobs:
       if: ${{ github.event_name != 'workflow_dispatch' || ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Full')) }}
       run: |  
         echo "It is check all!"
-        if ${{ inputs.my_boolean_input == 'true' }}; then
+        #if ${{ inputs.my_boolean_input == 'true' }}; then
+        if ${{ github.event.inputs.my_boolean_input }}; then
           echo "my_boolean_input is true"
         else
           echo "my_boolean_input is false"
