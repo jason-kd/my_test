@@ -92,12 +92,12 @@ jobs:
         
         if [[ "${{ github.event.inputs.message_type }}" == "All" ]]; then
           echo "output all!"
-          echo "$cppcheck_param 2"
+          echo "$cppcheck_param 3"
           #cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
           #cppcheck --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
           #cppcheck $cppcheck_param --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
           #cppcheck --enable=style --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
-          cppcheck --enable=style --inline-suppr --force --xml-version=2 --output-file=result.xml --exitcode-suppressions=err.xml --error-exitcode=1 ./          
+          cppcheck --enable=performance --inline-suppr --force --xml-version=2 --output-file=result.xml ./          
         elif [[ "${{ github.event.inputs.message_type }}" == "Error" ]]; then
           echo "output error!"
           cppcheck --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
