@@ -73,25 +73,26 @@ jobs:
       if: ${{ github.event_name != 'workflow_dispatch' || ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Full')) }}
       run: |  
         echo "It is check all!"
-        cppcheck_param="--enable "
+        cppcheck_param="--enable= "
         your_variable="${{ github.event.inputs.my_boolean_input }}"
         if [[ "$your_variable" == "true" ]]; then
           echo "my_boolean_input is true"
-          cppcheck_param+="warning"
+          cppcheck_param+=",warning"
         else
           echo "my_boolean_input is false"
         fi
         
         your_variable_2="${{ github.event.inputs.my_boolean_input_2 }}"
         if [[ "$your_variable_2" == "true" ]]; then
-          echo "my_boolean_input is true"
-          cppcheck_param+="style"
+          echo "my_boolean_input_2 is true"
+          cppcheck_param+=",style"
         else
           echo "my_boolean_input is false"
         fi
         
         if [[ "${{ github.event.inputs.message_type }}" == "All" ]]; then
           echo "output all!"
+          echo "$cppcheck_param"
           #cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
           cppcheck cppcheck_param --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
         elif [[ "${{ github.event.inputs.message_type }}" == "Error" ]]; then
