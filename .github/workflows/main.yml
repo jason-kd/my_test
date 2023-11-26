@@ -68,7 +68,8 @@ jobs:
       run: |  
         echo "It is check all!"
         #if ${{ inputs.my_boolean_input == 'true' }}; then
-        if ${{ github.event.inputs.my_boolean_input }}; then
+        your_variable="${{ github.event.inputs.my_boolean_input }}"
+        if [[ "$your_variable" == "true" ]]; then
           echo "my_boolean_input is true"
         else
           echo "my_boolean_input is false"
