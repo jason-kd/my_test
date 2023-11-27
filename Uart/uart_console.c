@@ -470,5 +470,9 @@ void uart_console_task_resume(void)
 	vTaskResume(console_hdl);
 	
 	
+	
+	
+	
+	
 }
 
