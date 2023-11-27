@@ -1,177 +1,20 @@
-name: Static code analysis
-on:   
+name: Cppcheck CI
+
+on:
   pull_request:
     branches:
-      - main
-      
-  # Run workflow on on demand through UI
-  workflow_dispatch:
-    inputs:
-      product_name:
-        description: 'Product build target name'
-        required: false
-        default: 'All'
-        type: choice
-        options:
-        - All
-        - V3
-        - PanV3
-      check_type:
-        description: 'check full or different only'
-        required: false
-        default: 'Full'
-        type: choice
-        options:
-        - Full
-        - Different
-      message_type:
-        description: 'output message type'
-        required: false
-        default: 'All'
-        type: choice
-        options:
-        - All
-        - Error
-        - Error + warning
-        - Error + warning + style
-        - Error + warning + style + performance
-        - Error + warning + style + performance + portability
-        
-      my_boolean_input:  # 定义一个布尔类型的输入选项
-        description: 'A boolean input'
-        required: false
-        default: true
-        type: boolean
-        
-      my_boolean_input_2:  # 定义一个布尔类型的输入选项
-        description: 'B boolean input'
-        required: false
-        default: true
-        type: boolean     
+      - main # 指定你的目标分支，可以根据实际情况进行更改
 
 jobs:
-  scancode_job:
-    # Run on hosted VM provided by GitHub
-    runs-on: ubuntu-20.04
-    name: Static code analysis
+  build:
+    runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
-      with:
-        # Needed as a workaround for https://github.com/actions/checkout/issues/287
-        # token: ${{ secrets.WYZE_SVC_GH_PAT }}
-        submodules: recursive
-        fetch-depth: '0'
-    - name: Install tools  
-      run: |
-        sudo apt-get -qq install cppcheck
-        git fetch origin
-        cppcheck --version
-        ls
-        git branch -a  
-        
-    - name: cppcheck full
-      if: ${{ github.event_name != 'workflow_dispatch' || ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Full')) }}
-      run: |  
-        echo "It is check all!"
-        cppcheck_param="--enable="
-        your_variable="${{ github.event.inputs.my_boolean_input }}"
-        if [[ "$your_variable" == "true" ]]; then
-          echo "my_boolean_input is true"
-          cppcheck_param+="warning"
-        else
-          echo "my_boolean_input is false"
-        fi
-        
-        your_variable_2="${{ github.event.inputs.my_boolean_input_2 }}"
-        if [[ "$your_variable_2" == "true" ]]; then
-          echo "my_boolean_input_2 is true"
-          cppcheck_param+=",style"
-        else
-          echo "my_boolean_input is false"
-        fi
-        
-        if [[ "${{ github.event.inputs.message_type }}" == "All" ]]; then
-          echo "output all!"
-          echo "$cppcheck_param 3"
-          #cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
-          #cppcheck --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
-          #cppcheck $cppcheck_param --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
-          #cppcheck --enable=style --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
-          cppcheck --inline-suppr --force --xml-version=2 --output-file=result.xml ./          
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error" ]]; then
-          echo "output error!"
-          cppcheck --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning" ]]; then
-          echo "output error + warning!"
-          cppcheck --enable=warning --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style" ]]; then
-          echo "output error + warning + style!"
-          cppcheck --enable=warning,style --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style + performance" ]]; then
-          echo "output error + warning + style + performance!"
-          cppcheck --enable=warning,style,performance --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style + performance + portability" ]]; then
-          echo "output error + warning + style + performance + portability!"
-          cppcheck --enable=warning,style,performance,portability --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
-        else
-          echo "output error + warning + style + performance + portability + information!"
-          cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 ./
-          # cppcheck-htmlreport --file=result.xml --report-dir=./report/html --title=universal-ctags --source-dir=.
-        fi
-        
-        # package the result
-        cppcheck-htmlreport --file=result.xml --report-dir=./report/html --title=universal-ctags --source-dir=.
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-        # only check the different files
-    - name: cppcheck different
-      if: ${{ (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Different') }}
-      run: |  
-        echo "It is check different!"        
-        changed_files=$(git diff --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
-        echo "$changed_files"
-        if [ -n "$changed_files" ];then
-          if [[ "${{ github.event.inputs.message_type }}" == "All" ]]; then
-            echo "output all!"
-            cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error" ]]; then
-            echo "output error!"
-            cppcheck --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning" ]]; then
-            echo "output error + warning!"
-            cppcheck --enable=warning --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style" ]]; then
-            echo "output error + warning + style!"
-            cppcheck --enable=warning,style --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style + performance" ]]; then
-            echo "output error + warning + style + performance!"
-            cppcheck --enable=warning,style,performance --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style + performance + portability" ]]; then
-            echo "output error + warning + style + performance + portability!"
-            cppcheck --enable=warning,style,performance,portability --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          else
-            echo "output error + warning + style + performance + portability + information!"
-            cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 $changed_files
-            # cppcheck-htmlreport --file=result.xml --report-dir=./report/html --title=universal-ctags --source-dir=.
-          fi
-        
-          # package the result
-          cppcheck-htmlreport --file=result.xml --report-dir=./report/html --title=universal-ctags --source-dir=.
-        else
-          echo "the files are the same"
-        fi
-        
-        
-        
-    - name: Upload v3_cppcheck_result artifacts
-      if: ${{ (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') }}
-      uses: actions/upload-artifact@v2
-      with:
-          name: v3_cppcheck_result
-          # path: ${{ github.workspace }}/cppcheckp/result.xml
-          path: ./report/html
+    - name: Install cppcheck
+      run: sudo apt-get install cppcheck
 
-        
-
-
-
-    
+    - name: Run cppcheck
+      run: cppcheck --enable=all .
