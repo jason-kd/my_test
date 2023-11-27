@@ -468,5 +468,7 @@ void uart_console_task_resume(void)
 	}
 	ESP_LOGI(TAG, "console_hdl resume");
 	vTaskResume(console_hdl);
+	
+	
 }
 
