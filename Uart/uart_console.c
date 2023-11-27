@@ -30,7 +30,9 @@ void uart_console_task(void *arg)
 	
 	char buffer[100];
 	ESP_LOGI(TAG, "%s, %d", __func__,__LINE__);
-	while(1){
+	
+		as32Test[11] = 10;
+	while(0){
 		memset(buffer, 0, sizeof(buffer));
 		//taskDelay(50);
 		fgets(buffer, 100, stdin);
