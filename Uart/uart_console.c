@@ -26,7 +26,9 @@ void uart_console_task(void *arg)
 	
 	int as32Test[10] = {0};
 	
-	as32Test[11] = 10;
+
+	as32Test[9] = 10;
+
 	
 	char buffer[100];
 	ESP_LOGI(TAG, "%s, %d", __func__,__LINE__);
