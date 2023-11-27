@@ -466,6 +466,8 @@ void uart_console_task_resume(void)
 		ESP_LOGI(TAG, "%s,console_hdl NULL", __func__);
 		return;
 	}
+	
+	trest;
 	ESP_LOGI(TAG, "console_hdl resume");
 	vTaskResume(console_hdl);
 	
