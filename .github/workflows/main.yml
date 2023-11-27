@@ -18,6 +18,7 @@ on:
         - PanV3
       check_type:
         description: 'check full or different only'
+
         required: false
         default: 'Full'
         type: choice
@@ -49,6 +50,7 @@ on:
         default: true
         type: boolean     
 
+
 jobs:
   scancode_job:
     # Run on hosted VM provided by GitHub
@@ -70,6 +72,7 @@ jobs:
         git branch -a  
         
     - name: cppcheck full
+
       if: ${{ github.event_name != 'workflow_dispatch' || ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Full')) }}
       run: |  
         echo "It is check all!"
@@ -98,6 +101,7 @@ jobs:
           #cppcheck $cppcheck_param --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
           #cppcheck --enable=style --inline-suppr --force --xml-version=2 --output-file=result.xml  ./
           cppcheck --inline-suppr --force --xml-version=2 --output-file=result.xml ./          
+
         elif [[ "${{ github.event.inputs.message_type }}" == "Error" ]]; then
           echo "output error!"
           cppcheck --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
@@ -124,9 +128,11 @@ jobs:
 
         # only check the different files
     - name: cppcheck different
+
       if: ${{ (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Different') }}
       run: |  
         echo "It is check different!"        
+
         changed_files=$(git diff --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
         echo "$changed_files"
         if [ -n "$changed_files" ];then
