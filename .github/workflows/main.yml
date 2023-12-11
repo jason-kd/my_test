@@ -236,7 +236,7 @@ jobs:
           route: POST /repos/{owner}/{repo}/issues/{issue_number}/comments
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
-          issue_number: ${{ $MY_NUMBER }}
+          issue_number: ${{ MY_NUMBER }}
           body: |
             This is a comment.
 
