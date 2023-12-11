@@ -231,11 +231,12 @@ jobs:
       uses: octokit/request-action@v2.x
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MY_NUMBER: 42
       with:
           route: POST /repos/{owner}/{repo}/issues/{issue_number}/comments
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
-          issue_number: ${{ "11" }}
+          issue_number: ${{ $MY_NUMBER }}
           body: |
             This is a comment.
 
