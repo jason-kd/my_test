@@ -64,10 +64,10 @@ on:
         default: false
         type: boolean   
         
-  workflow_run:
-    workflows: ["Manual Approval Workflow"]
-    types:
-      - completed           
+  # workflow_run:
+    # workflows: ["Manual Approval Workflow"]
+    # types:
+      # - completed           
 jobs:
   scancode_job:
     # Run on hosted VM provided by GitHub
@@ -231,13 +231,38 @@ jobs:
         fi
 
 
-  manual-approval:
-    runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+    - name: Manual approval
+      id: approval
+      if: always()
+      run: |
+        echo "Please manually approve this job by commenting '/approve' on the pull request."
 
-    steps:
-      - name: Manual approval
-        run: echo "Please manually approve this job."
+    - name: Check approval
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        CHECK_INTERVAL=5  # 检查间隔时间（秒）
+        MAX_CHECKS=3600     # 最大检查次数
+        CHECK_COUNT=0
+
+        while true; do
+          COMMENTS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments")
+            
+          if [[ $COMMENTS == *"/approve"* ]]; then
+            echo "Job approved."
+            break
+          fi
+
+          if [[ $CHECK_COUNT -ge $MAX_CHECKS ]]; then
+            echo "Timeout. Job not approved."
+            exit 1
+          fi
+
+            echo "Waiting for approval..."
+            sleep $CHECK_INTERVAL
+            ((CHECK_COUNT++))
+          done
 
 
 
