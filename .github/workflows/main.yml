@@ -2,7 +2,7 @@ name: Static code analysis
 on:   
   pull_request:
     branches:
-      - master
+      - main
       
   # Run workflow on on demand through UI
   workflow_dispatch:
@@ -73,9 +73,9 @@ jobs:
     - uses: actions/checkout@v4
       with:
         # Needed as a workaround for https://github.com/actions/checkout/issues/287
-        token: ${{ secrets.WYZE_SVC_GH_PAT }}
-        submodules: recursive
-        fetch-depth: '0'
+        # token: ${{ secrets.WYZE_SVC_GH_PAT }}
+         submodules: recursive
+         fetch-depth: '0'
     - name: Install tools  
       run: |
         sudo apt-get -qq install cppcheck
