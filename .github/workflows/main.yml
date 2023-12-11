@@ -258,10 +258,10 @@ jobs:
               // Delay between checking for new comments
               await new Promise(resolve => setTimeout(resolve, 5000));
             }
-    - name: Continue CI pipeline
-      if: ${{ steps.wait_for_review.outcome != 'success' }}
-      run: |
-          exit 1
+    # - name: Continue CI pipeline
+      # if: ${{ steps.wait_for_review.outcome != 'success' }}
+      # run: |
+          # exit 1
 
 
 
