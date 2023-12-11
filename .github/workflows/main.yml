@@ -229,6 +229,8 @@ jobs:
     - name: Create comment
       id: create-comment
       uses: octokit/request-action@v2.x
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           route: POST /repos/{owner}/{repo}/issues/{issue_number}/comments
           owner: ${{ github.repository_owner }}
