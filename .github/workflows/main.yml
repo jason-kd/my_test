@@ -1,9 +1,8 @@
-
 name: Static code analysis
 on:   
   pull_request:
     branches:
-      - main
+      - master
       
   # Run workflow on on demand through UI
   workflow_dispatch:
@@ -16,38 +15,65 @@ on:
         options:
         - All
         - V3
-        - PanV3
+        - V4
+        - Floodlight cam v2
+        - Doorbell v2
+        
       check_type:
-        description: 'check full or different only'
+        description: 'check full files or different files'
         required: false
         default: 'Full'
         type: choice
         options:
         - Full
         - Different
-      message_type:
-        description: 'output message type'
+        
+      all_set:
+        description: 'show all'
         required: false
-        default: 'All'
-        type: choice
-        options:
-        - All
-        - Error
-        - Error + warning
-        - Error + warning + style
-        - Error + warning + style + performance
-        - Error + warning + style + performance + portability
+        default: true
+        type: boolean
+        
+      warning_set:
+        description: 'show warning'
+        required: false
+        default: false
+        type: boolean         
 
+      style_set:
+        description: 'show styel'
+        required: false
+        default: false
+        type: boolean    
+
+      performance_set:
+        description: 'show performance'
+        required: false
+        default: false
+        type: boolean 
+
+      portability_set:
+        description: 'show portability'
+        required: false
+        default: false
+        type: boolean    
+
+      information_set:
+        description: 'show information'
+        required: false
+        default: false
+        type: boolean        
+           
 jobs:
   scancode_job:
     # Run on hosted VM provided by GitHub
     runs-on: ubuntu-20.04
     name: Static code analysis
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         # Needed as a workaround for https://github.com/actions/checkout/issues/287
-        # token: ${{ secrets.WYZE_SVC_GH_PAT }}
+        token: ${{ secrets.WYZE_SVC_GH_PAT }}
         submodules: recursive
         fetch-depth: '0'
     - name: Install tools  
@@ -57,84 +83,191 @@ jobs:
         cppcheck --version
         ls
         git branch -a  
-        
-    - name: cppcheck full
-        echo "check all!"
-      if: ${{ github.event_name != 'workflow_dispatch' || ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Full')) }}
-      run: |  
-        if [[ "${{ github.event.inputs.message_type }}" == "All" ]]; then
-          echo "output all!"
-          cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 ./
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error" ]]; then
-          echo "output error!"
-          cppcheck --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning" ]]; then
-          echo "output error + warning!"
-          cppcheck --enable=warning --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style" ]]; then
-          echo "output error + warning + style!"
-          cppcheck --enable=warning,style --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style + performance" ]]; then
-          echo "output error + warning + style + performance!"
-          cppcheck --enable=warning,style,performance --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
-        elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style + performance + portability" ]]; then
-          echo "output error + warning + style + performance + portability!"
-          cppcheck --enable=warning,style,performance,portability --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 ./
+
+    - name: parse cppcheck param
+      if:  ${{ (github.event_name == 'workflow_dispatch') }}
+      run:  |
+        enalbe_param=""
+        if [[ (${{ github.event.inputs.all_set }} == 'true') ]]; then
+          enalbe_param="all"
         else
-          echo "output error + warning + style + performance + portability + information!"
-          cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 ./
-          # cppcheck-htmlreport --file=result.xml --report-dir=./report/html --title=universal-ctags --source-dir=.
+          if [[ (${{ github.event.inputs.warning_set }} == 'true') ]]; then
+            enalbe_param="warning"
+          fi
+
+          if [[ (${{ github.event.inputs.style_set }} == 'true') ]]; then
+            if [ -z "$enalbe_param" ]; then
+              enalbe_param="style"
+            else
+              enalbe_param+=",style"
+            fi 
+          fi
+          
+          if [[ (${{ github.event.inputs.performance_set }} == 'true') ]]; then
+            if [ -z "$enalbe_param" ]; then
+              enalbe_param="performance"
+            else
+              enalbe_param+=",performance"
+            fi
+          fi
+          
+          if [[ (${{ github.event.inputs.portability_set }} == 'true') ]]; then
+            if [ -z "$enalbe_param" ]; then
+              enalbe_param="portability"
+            else
+              enalbe_param+=",portability"
+            fi
+          fi  
+          
+          if [[ (${{ github.event.inputs.information_set }} == 'true') ]]; then
+            if [ -z "$enalbe_param" ]; then
+              enalbe_param="information"
+            else
+              enalbe_param+=",information"
+            fi
+          fi             
         fi
         
-        # package the result
-        cppcheck-htmlreport --file=result.xml --report-dir=./report/html --title=universal-ctags --source-dir=.
-
-        # only check the different files
-    - name: cppcheck different
-        echo "check different!"
-      if: ${{ (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') && (github.event.inputs.check_type == 'Different') }}
-      run: |  
-        changed_files=$(git diff --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
-        echo "$changed_files"
-        if [ -n "$changed_files" ];then
-          if [[ "${{ github.event.inputs.message_type }}" == "All" ]]; then
-            echo "output all!"
-            cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error" ]]; then
-            echo "output error!"
-            cppcheck --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning" ]]; then
-            echo "output error + warning!"
-            cppcheck --enable=warning --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style" ]]; then
-            echo "output error + warning + style!"
-            cppcheck --enable=warning,style --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style + performance" ]]; then
-            echo "output error + warning + style + performance!"
-            cppcheck --enable=warning,style,performance --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          elif [[ "${{ github.event.inputs.message_type }}" == "Error + warning + style + performance + portability" ]]; then
-            echo "output error + warning + style + performance + portability!"
-            cppcheck --enable=warning,style,performance,portability --inline-suppr --force --output-file=result.xml --xml-version=2 --error-exitcode=1 $changed_files
-          else
-            echo "output error + warning + style + performance + portability + information!"
-            cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 $changed_files
-            # cppcheck-htmlreport --file=result.xml --report-dir=./report/html --title=universal-ctags --source-dir=.
-          fi
+        echo "cppcheck --enable=$enalbe_param"
+        echo "$enalbe_param" > enalbe_param.txt
+        echo "" > check_type.txt
         
-          # package the result
+    - name: cppcheck all files  
+      if: ${{ (github.event_name == 'workflow_dispatch') && ((github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3' || github.event.inputs.product_name == 'V4' || github.event.inputs.product_name == 'Floodlight cam v2' || github.event.inputs.product_name == 'Doorbell v2') && (github.event.inputs.check_type == 'Full')) }}
+      run: | 
+        # check_type="all"
+        echo "all" > check_type.txt
+        enalbe_param=$(cat enalbe_param.txt)
+        
+          if [ -z "$enalbe_param" ]; then
+            cppcheck --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 ./   
+          else
+            cppcheck --enable=$enalbe_param --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 ./
+          fi  
+      continue-on-error: true    
+   
+    - name: report_html_all
+      if:  ${{ (github.event_name == 'workflow_dispatch') }}
+      run: |  
+        check_type=$(cat check_type.txt)
+        if [[ "$check_type" == "all" ]]; then
           cppcheck-htmlreport --file=result.xml --report-dir=./report/html --title=universal-ctags --source-dir=.
+          echo "report all success"
+        fi
+
+      # on workflow_dispatch only check the different files
+    - name: cppcheck different files
+      if: ${{ (github.event_name == 'workflow_dispatch') && (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3' || github.event.inputs.product_name == 'V4' || github.event.inputs.product_name == 'Floodlight cam v2' || github.event.inputs.product_name == 'Doorbell v2') && (github.event.inputs.check_type == 'Different') }}
+      run: |  
+        changed_files=$(git diff --name-only HEAD origin/master | grep -E '\.(c|cpp|cc|cxx)$' || true)
+        # echo "different files is: $changed_files"
+        echo "diff" > check_type.txt
+        enalbe_param=$(cat enalbe_param.txt)
+        
+        if [ -n "$changed_files" ]; then
+          echo "enable=$enalbe_param"
+          if [ -z "$enalbe_param" ]; then
+              cppcheck --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1 $changed_files  
+          else
+              cppcheck --enable=$enalbe_param --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1  $changed_files   
+          fi            
         else
           echo "the files are the same"
+        fi        
+      continue-on-error: true
+
+      # on pull_request
+    - name: pull_request_check
+      if:  ${{ (github.event_name == 'pull_request') }}
+      run: | 
+        changed_files=$(git diff --name-only HEAD origin/master | grep -E '\.(c|cpp|cc|cxx)$' || true)
+        # echo "different files is: $changed_files"
+        echo "diff" > check_type.txt
+        
+        if [ -n "$changed_files" ]; then
+              cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1  $changed_files          
+        else
+          echo "the files are the same"
+        fi        
+      continue-on-error: true
+      
+    - name: report_html_diff     
+      run: |  
+        check_type=$(cat check_type.txt)
+        # echo "check_type=$check_type"
+        if [[ "$check_type" == "diff" ]]; then
+          if [[ -e result.xml ]]; then
+            cppcheck-htmlreport --file=result.xml --report-dir=./report/html --title=universal-ctags --source-dir=.
+            echo "report diff success"
+          fi
         fi
         
-        
-        
     - name: Upload v3_cppcheck_result artifacts
-      if: ${{ (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3') }}
-      uses: actions/upload-artifact@v2
+      if: ${{ (github.event_name != 'workflow_dispatch') || (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3' || github.event.inputs.product_name == 'V4' || github.event.inputs.product_name == 'Floodlight cam v2' || github.event.inputs.product_name == 'Doorbell v2') }}
+      uses: actions/upload-artifact@v3
       with:
           name: v3_cppcheck_result
-          # path: ${{ github.workspace }}/cppcheckp/result.xml
           path: ./report/html
 
+    - name: Check cppcheck results
+      run: |
+        if [ -e "result.xml" ]; then
+            # cat result.xml
+            # if grep -q 'severity="error"' result.xml; then
+              # echo "error::Cppcheck found errors"
+              # exit 1
+            # fi
+            
+            while read -r line; do
+              # 使用grep命令查找匹配的行
+              if echo "$line" | grep -q 'severity="error"'; then
+                  echo "$line"
+              fi
+            done < result.xml
+        fi
 
+    - name: Prompt for user input
+      id: prompt
+      uses: github-script@v4
+      with:
+        script: |
+            const issueComment = await github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Please provide your input:'
+            });
+            
+            const commentId = issueComment.data.id;
+            
+            // Wait for user to enter a comment
+            while (true) {
+              const comments = await github.issues.listComments({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+              
+              const userComment = comments.data.find(comment => comment.id === commentId);
+              
+              if (userComment && userComment.body !== 'Please provide your input:') {
+                core.setOutput('userInput', userComment.body);
+                break;
+              }
+              
+              // Delay between checking for new comments
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+    - name: Continue CI pipeline
+      if: ${{ steps.wait_for_review.outcome != 'success' }}
+      run: |
+          exit 1
+
+
+
+
+
+
+
+
+        
