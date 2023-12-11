@@ -226,42 +226,24 @@ jobs:
             done < result.xml
         fi
 
-    - name: Prompt for user input
-      id: prompt
-      uses: github-script@v4
+    - name: Create comment
+      id: create-comment
+      uses: octokit/request-action@v2.x
       with:
-        script: |
-            const issueComment = await github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'Please provide your input:'
-            });
-            
-            const commentId = issueComment.data.id;
-            
-            // Wait for user to enter a comment
-            while (true) {
-              const comments = await github.issues.listComments({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo
-              });
-              
-              const userComment = comments.data.find(comment => comment.id === commentId);
-              
-              if (userComment && userComment.body !== 'Please provide your input:') {
-                core.setOutput('userInput', userComment.body);
-                break;
-              }
-              
-              // Delay between checking for new comments
-              await new Promise(resolve => setTimeout(resolve, 5000));
-            }
-    # - name: Continue CI pipeline
-      # if: ${{ steps.wait_for_review.outcome != 'success' }}
-      # run: |
-          # exit 1
+          route: POST /repos/{owner}/{repo}/issues/{issue_number}/comments
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          issue_number: ${{ github.event.number }}
+          body: |
+            This is a comment.
+
+    - name: Check comment result
+      run: |
+        echo "Comment status: ${{ steps.create-comment.outputs.status }}"
+        if [[ "${{ steps.create-comment.outputs.status }}" != "201" ]]; then
+          echo "Comment creation failed. Exiting..."
+          exit 1
+        fi
 
 
 
