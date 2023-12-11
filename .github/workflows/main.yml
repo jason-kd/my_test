@@ -226,26 +226,19 @@ jobs:
             done < result.xml
         fi
 
-    - name: Create comment
-      id: create-comment
-      uses: octokit/request-action@v2.x
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-          route: POST /repos/{owner}/{repo}/issues/{issue_number}/comments
-          owner: ${{ github.repository_owner }}
-          repo: ${{ github.event.repository.name }}
-          issue_number: ${{ github.event.number }}
-          body: |
-            This is a comment.
 
-    - name: Check comment result
+    - name: Manual approval
+      id: approval
+      if: ${{ always() }}   # 始终运行此步骤
+      run: echo "Please manually approve this job by commenting '/approve' on the pull request."
+
+    - name: Check approval
       run: |
-        echo "Comment status: ${{ steps.create-comment.outputs.status }}"
-        if [[ "${{ steps.create-comment.outputs.status }}" != "201" ]]; then
-          echo "Comment creation failed. Exiting..."
+        if [[ "${{ github.event.comment.body }}" != "/approve" ]]; then
+          echo "Job not approved. Exiting..."
           exit 1
         fi
+
 
 
 
