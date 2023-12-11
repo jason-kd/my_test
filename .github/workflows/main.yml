@@ -62,8 +62,12 @@ on:
         description: 'show information'
         required: false
         default: false
-        type: boolean        
-           
+        type: boolean   
+        
+  workflow_run:
+    workflows: ["Manual Approval Workflow"]
+    types:
+      - completed           
 jobs:
   scancode_job:
     # Run on hosted VM provided by GitHub
@@ -227,17 +231,13 @@ jobs:
         fi
 
 
-    - name: Manual approval
-      id: approval
-      if: ${{ always() }}   # 始终运行此步骤
-      run: echo "Please manually approve this job by commenting '/approve' on the pull request."
+  manual-approval:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
 
-    - name: Check approval
-      run: |
-        if [[ "${{ github.event.comment.body }}" != "/approve" ]]; then
-          echo "Job not approved. Exiting..."
-          exit 1
-        fi
+    steps:
+      - name: Manual approval
+        run: echo "Please manually approve this job."
 
 
 
