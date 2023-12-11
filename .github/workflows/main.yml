@@ -232,7 +232,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          route: POST /repos/{owner}/{repo}/issues/{issue_number}/comments
+          route: POST /repos/{jason-kd}/{my_test}/issues/{11}/comments
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
           issue_number: ${{ github.event.number }}
