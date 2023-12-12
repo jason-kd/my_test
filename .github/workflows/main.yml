@@ -231,23 +231,20 @@ jobs:
         fi
 
 
-    - name: Manual approval
-      run: |
-        curl -L \
-          -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/issues/${{ github.event.number }}/comments \
-          -d '{"body":"cppcheck done"}'
 
-        curl -L \
-          -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/pulls/${{ github.event.number }}/requested_reviewers \
-          -d '{"reviewers":["octocat","hubot","other_user"],"team_reviewers":["justice-league"]}'
+    - name: Prompt for comment
+      id: prompt
+      run: |
+        echo "::set-output name=comment::$(read -p 'Enter your comment: ' userInput && echo $userInput)"
+
+    - name: Create comment
+      id: create_comment
+      run: |
+        echo "Comment: ${{ steps.prompt.outputs.comment }}"
+
+    - name: Use comment in further steps
+      run: |
+        echo "Comment received: ${{ steps.create_comment.outputs.comment }}"
 
 
 
