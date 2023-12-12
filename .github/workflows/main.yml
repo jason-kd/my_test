@@ -240,11 +240,21 @@ jobs:
     - name: Create comment
       id: create_comment
       run: |
-        echo "Comment: ${{ steps.prompt.outputs.comment }}"
+        # Set up the request headers and body
+        curl -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -d '{"body": "Your comment text"}' \
+          https://api.github.com/repos/${{ github.repository }}/issues/${{ github.run_id }}/comments
 
-    - name: Use comment in further steps
+    - name: Retrieve comment ID
+      id: get_comment_id
       run: |
-        echo "Comment received: ${{ steps.create_comment.outputs.comment }}"
+        echo "::set-output name=comment_id::$(jq -r '.id' <<< ${{ steps.create_comment.outputs.comment }})"
+
+    - name: Use comment ID in further steps
+      run: |
+        echo "Comment ID: ${{ steps.get_comment_id.outputs.comment_id }}"
 
 
 
