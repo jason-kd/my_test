@@ -231,7 +231,10 @@ jobs:
         fi
 
     - name: Install cppcheck-parser
-      run: pip install cppcheck-parser
+      run: |
+        pip install --upgrade pip
+        pip config get global.index-url
+        pip install cppcheck-parser
     
     - name: Create comment
       id: create_comment
