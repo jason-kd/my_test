@@ -234,19 +234,19 @@ jobs:
     - name: Create comment
       id: create_comment
       run: |
-        COMMENT_TITLE="Cppcheck Report"
-            COMMENT_BODY="result.xml"
-            
-            OWNER="${{ github.repository_owner }}"
-            REPO="${{ github.repository }}"
-            ISSUE_NUMBER="${{ github.event.number }}"
-            
-            echo "Creating Review Comment..."
-            API_URL="https://api.github.com/repos/$OWNER/$REPO/issues/$ISSUE_NUMBER/comments"
-            COMMENT_PAYLOAD=$(jq -n --arg title "$COMMENT_TITLE" --arg body "$COMMENT_BODY" \
-                              '{body: $body, commit_id: "", path: "", position: 0}')
-            curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                  -d "$COMMENT_PAYLOAD" "$API_URL"         
+        # COMMENT_TITLE="Cppcheck Report"
+           # COMMENT_BODY="result.xml"
+        COMMENT_BODY=$(cppcheck-parser --file result.xml)
+        
+        PR_NUMBER="${{ github.event.pull_request.number }}"
+        OWNER="${{ github.repository_owner }}"
+        REPO="${{ github.repository }}"
+        
+        echo "Creating Review Comment..."
+        API_URL="https://api.github.com/repos/$OWNER/$REPO/pulls/$PR_NUMBER/reviews"
+        REVIEW_PAYLOAD="{\"body\":\"$COMMENT_BODY\",\"event\":\"COMMENT\"}"
+        curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -d "$REVIEW_PAYLOAD" "$API_URL"         
 
 
 
