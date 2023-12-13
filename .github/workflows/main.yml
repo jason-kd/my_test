@@ -230,13 +230,15 @@ jobs:
             done < result.xml
         fi
 
-
+    - name: Install cppcheck-parser
+      run: pip install cppcheck-parser
+    
     - name: Create comment
       id: create_comment
       run: |
         # COMMENT_TITLE="Cppcheck Report"
-        COMMENT_BODY="result.xml"
-        # COMMENT_BODY=$(cppcheck-parser --file result.xml)
+        # COMMENT_BODY="result.xml"
+        COMMENT_BODY=$(cppcheck-parser --file result.xml)
         
         PR_NUMBER="${{ github.event.pull_request.number }}"
         OWNER="${{ github.repository_owner }}"
