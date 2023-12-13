@@ -242,7 +242,9 @@ jobs:
             -d '{
                   "body": "Cppcheck found issues in the code:\n\nIssue description"
                 }')
-          echo "::set-output name=comment_id::$(echo "$response" | jq -r '.id')"
+          # echo "::set-output name=comment_id::$(echo "$response" | jq -r '.id')"
+          # echo "::set-output name={name}::{value}"
+          echo "{name}={comment_id::$(echo "$response" | jq -r '.id')"}" >> $GITHUB_OUTPUT
 
     - name: Reply to review comment
       env:
