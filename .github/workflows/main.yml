@@ -240,20 +240,31 @@ jobs:
     
     - name: Create comment
       id: create_comment
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        # COMMENT_TITLE="Cppcheck Report"
-        # COMMENT_BODY="result.xml"
-        COMMENT_BODY=$(cppcheck-parser --file result.xml)
-        
-        PR_NUMBER="${{ github.event.pull_request.number }}"
-        OWNER="${{ github.repository_owner }}"
-        REPO="${{ github.repository }}"
-        
-        echo "Creating Review Comment..."
-        API_URL="https://api.github.com/repos/$OWNER/$REPO/pulls/$PR_NUMBER/reviews"
-        REVIEW_PAYLOAD="{\"body\":\"$COMMENT_BODY\",\"event\":\"COMMENT\"}"
-        curl -s -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -d "$REVIEW_PAYLOAD" "$API_URL"         
+          response=$(curl -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/comments \
+            -d '{
+                  "body": "Cppcheck found issues in the code:\n\nIssue description"
+                }')
+          echo "::set-output name=comment_id::$(echo "$response" | jq -r '.id')"
+
+    - name: Reply to review comment
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COMMENT_ID: ${{ steps.create_comment.outputs.comment_id }}
+      run: |
+        curl -X POST \
+          -H "Authorization: Bearer $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/comments \
+          -d '{
+                "body": "Reply to the review comment",
+                "in_reply_to": '${{ env.COMMENT_ID }}'
+              }'        
 
 
 
