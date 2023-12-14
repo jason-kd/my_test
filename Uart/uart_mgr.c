@@ -38,6 +38,10 @@ static bool uart1_start = false;
 
 uint8_t get_uart_last_cmd_ack(uint32_t block_time_ms)
 {
+	
+	int s32Test[10] = {0}
+	
+	
 	uint8_t ack = 0;
 
 	if(uart_ack_mutex != NULL)
