@@ -4,7 +4,7 @@
 #include "uart_mgr.h"
 
 static char *TAG="console";
-
+fsafsdfs
 
 static TaskHandle_t console_hdl;
 
@@ -23,12 +23,11 @@ int file_write_test(void *p)
 
 void uart_console_task(void *arg)
 {
+	int s32Test = 0;
 	
 	int as32Test[10] = {0};
 	
-
-	as32Test[9] = 10;
-
+	as32Test[11] = 11;
 	
 	char buffer[100];
 	ESP_LOGI(TAG, "%s, %d", __func__,__LINE__);
@@ -450,6 +449,10 @@ void uart_console_task_init(void)
 
 void uart_console_task_suspend(void)
 {
+	int as32Test[11] = {0};
+	
+	as32Test[11] = 15;
+	
 	if(console_hdl == NULL)
 	{
 		ESP_LOGI(TAG, "%s,console_hdl NULL", __func__);
@@ -466,7 +469,15 @@ void uart_console_task_resume(void)
 		ESP_LOGI(TAG, "%s,console_hdl NULL", __func__);
 		return;
 	}
+	
+	trest;
 	ESP_LOGI(TAG, "console_hdl resume");
 	vTaskResume(console_hdl);
+	
+	
+	
+	
+	
+	
 }
 
