@@ -255,7 +255,7 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/pulls/${{ github.event.pull_request.number }}/reviews \
-          -d '{"commit_id":"13354072bdb8c87adcd77c2f2937671d8c76806c","body":"cppcheck verify","event":"REQUEST_CHANGES","comments":[{"path":"Uart/uart_console.c","position":6,"body":"Please fix this typo."}]}'
+          -d '{"commit_id":"13354072bdb8c87adcd77c2f2937671d8c76806c","body":"cppcheck verify","event":"REQUEST_CHANGES","comments":[{"path":"Uart/uart_mgr.c","position":6,"body":"Please fix this typo."}]}'
 
       
 
