@@ -241,7 +241,7 @@ jobs:
         
         # change_file=$(cat change_files.txt")
           pwd
-          change_file="Uart/cutyuv.c"
+          change_file="Uart/uart_console.c"
           # change_file="uart_console.c"
           echo "change file:$change_file"
 
@@ -249,7 +249,7 @@ jobs:
             echo "change_file exist"
           fi
 
-          jsonData="{\"commit_id\":\"13354072bdb8c87adcd77c2f2937671d8c76806c\",\"body\":\"cppcheck verify\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"Uart/uart_console.c\",\"position\":6,\"body\":\"Please fix this typo.\"}]}"
+          jsonData="{\"commit_id\":\"13354072bdb8c87adcd77c2f2937671d8c76806c\",\"body\":\"cppcheck verify\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file\",\"position\":6,\"body\":\"Please fix this typo.\"}]}"
         curl -L \
           -X POST \
           -H "Accept: application/vnd.github+json" \
