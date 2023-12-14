@@ -231,6 +231,7 @@ jobs:
         fi
 
     - name: review comment
+      working-directory: ./
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
