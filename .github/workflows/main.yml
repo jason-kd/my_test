@@ -251,6 +251,7 @@ jobs:
 
           jsonData="{\"commit_id\":\"e101dc3f069e64a54eb50eaf5321e8c48a827c77\",\"body\":\"cppcheck verify\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file\",\"position\":6,\"body\":\"Please fix this typo.\"}]}"
           echo "$jsonData"
+
         curl -L \
           -X POST \
           -H "Accept: application/vnd.github+json" \
