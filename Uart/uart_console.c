@@ -21,8 +21,8 @@ int file_write_test(void *p)
 
 	as32Test[10] = 12;
 	
-    xTaskCreate(file_write_test_thread, "testf", 4*1024, NULL, 5, NULL);
-	return 0;
+	as32Test[11] = 12;
+	
 }
 
 void uart_console_task(void *arg)
