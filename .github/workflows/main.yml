@@ -230,6 +230,8 @@ jobs:
               # 使用grep命令查找匹配的行
               if echo "$line" | grep -q 'severity="error"'; then
                   echo "$line"
+                  echo "result.txt is:"
+                  cat check_result.txt
                   if [[ !(-s "check_result.txt") ]]; then
                     echo "result_err" > check_result.txt
                     echo "record err result"
