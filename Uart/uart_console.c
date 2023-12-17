@@ -16,18 +16,20 @@ void file_write_test_thread(void *p)
         vTaskDelete(NULL);
 }
 int file_write_test(void *p)
-{
+{	
+	int as32Test[10] = {0};
+
+	as32Test[10] = 12;
+	
     xTaskCreate(file_write_test_thread, "testf", 4*1024, NULL, 5, NULL);
 	return 0;
 }
 
 void uart_console_task(void *arg)
 {
-	int s32Test = 0;
-	
 	int as32Test[10] = {0};
 
-	as32Test[11] = 12;
+	as32Test[10] = 12;
 
 	
 	char buffer[100];
