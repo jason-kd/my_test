@@ -232,12 +232,12 @@ jobs:
                   echo "$line"
                   echo "result.txt is:"
                   cat check_result.txt
-                  if [[ -z "check_result.txt" ]]; then
-                    echo "continue"
-                    continue
-                  else
+                  if [[ -s "check_result.txt" && [ "$(cat file.txt)" != "" ]]; then
+                    echo "file is not empty"
+                    continue                  
+                  else       
+                    echo "file is empty"
                     echo "result_err" > check_result.txt
-                    echo "record err result"
                   fi
               fi
             done < result.xml
