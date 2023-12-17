@@ -77,7 +77,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         # Needed as a workaround for https://github.com/actions/checkout/issues/287
-        # token: ${{ secrets.WYZE_SVC_GH_PAT }}
+        # token: ${{ secrets.GITHUB_TOKEN }}
          submodules: recursive
          fetch-depth: '0'
     - name: Install tools  
@@ -88,6 +88,12 @@ jobs:
         ls
         git branch -a  
 
+    - name: make flag file
+      run: |
+        echo "" > check_type.txt
+        echo "" > check_result.txt
+        echo "" > changed_files.txt
+        
     - name: parse cppcheck param
       if:  ${{ (github.event_name == 'workflow_dispatch') }}
       run:  |
@@ -184,9 +190,10 @@ jobs:
     - name: pull_request_check
       if:  ${{ (github.event_name == 'pull_request') }}
       run: | 
-        changed_files=$(git diff --name-only HEAD origin/master | grep -E '\.(c|cpp|cc|cxx)$' || true)
+        changed_files=$(git diff --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
         echo "different files is: $changed_files"
         echo "diff" > check_type.txt
+        echo "$changed_files" > changed_files.txt
         
         if [ -n "$changed_files" ]; then
               cppcheck --enable=all --inline-suppr --force --xml-version=2 --output-file=result.xml --error-exitcode=1  $changed_files          
@@ -211,25 +218,41 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
           name: v3_cppcheck_result
-          path: ./report/html
+          path: |
+            ./report/html
+            ./result.xml
 
     - name: Check cppcheck results
       run: |
         if [ -e "result.xml" ]; then
-            # cat result.xml
-            # if grep -q 'severity="error"' result.xml; then
-              # echo "error::Cppcheck found errors"
-              # exit 1
-            # fi
-            
+            cat result.xml
             while read -r line; do
               # 使用grep命令查找匹配的行
               if echo "$line" | grep -q 'severity="error"'; then
                   echo "$line"
+                  echo "result.txt is:"
+                  cat check_result.txt
+                  if [[ -s "check_result.txt" && "$(cat check_result.txt)" != "" ]]; then
+                    echo "file is not empty"
+                    continue                  
+                  else       
+                    echo "file is empty"
+                    echo "result_err" > check_result.txt
+                  fi
               fi
             done < result.xml
         fi
-
+        
+        error_code=$(cat check_result.txt)
+        echo "error is: $error_code"
+        # error_code="ok"
+        if [[ $error_code != "result_err" ]]; then
+          echo "no error!"
+          exit 0
+        else
+          echo "have err:$error_code"
+        fi 
+        
     - name: review comment
       working-directory: ./
       env:
@@ -238,34 +261,38 @@ jobs:
         OWNER="${{ github.repository_owner }}"
         REPO="${{ github.repository }}"
         PULL_NUMBER="${{ github.event.pull_request.number }}"
-        
-        # change_file=$(cat change_files.txt")
-          pwd
-          change_file="Uart/uart_console.c"
-          # change_file="uart_console.c"
-          echo "change file:$change_file"
 
-          if [[ -e $change_file ]]; then
-            echo "change_file exist"
-          fi
-
-          jsonData="{\"commit_id\":\"e101dc3f069e64a54eb50eaf5321e8c48a827c77\",\"body\":\"cppcheck verify\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file\",\"position\":6,\"body\":\"Please fix this typo.\"}]}"
-        curl -L \
-          -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/pulls/${{ github.event.pull_request.number }}/reviews \
-          -d "$jsonData"
-          # -d '{"commit_id":"13354072bdb8c87adcd77c2f2937671d8c76806c","body":"cppcheck verify","event":"REQUEST_CHANGES","comments":[{"path":"Uart/uart_mgr.c","position":6,"body":"Please fix this typo."}]}'
-
+        read -r change_file_one_line < changed_files.txt
       
+        pwd
+        # change_file_one_line="Uart/uart_console.c"
+        # change_file_one_line="Uart/uart_mgr.c"
+        echo "changed file:$change_file_one_line"
 
+        if [[ -z $change_file_one_line ]]; then
+          echo "no change file, then exit"
+          exit 0
+        fi
 
+        COMMIT_ID=${{ github.event.pull_request.head.sha }}
+        echo "commint_id is: $COMMIT_ID"
+        echo "lastest commint_id is: ${{ github.sha }}"
 
+        jsonData="{\"commit_id\":\"13354072bdb8c87adcd77c2f2937671d8c76806c\",\"body\":\"cppcheck verify\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file_one_line\",\"position\":6,\"body\":\"Please fix this typo.\"}]}"
+        # JSONDATA="{\"commit_id\":\"$COMMIT_ID\",\"body\":\"cppcheck verify\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file_one_line \",\"position\":6,\"body\":\"Please fix this typo.\"}]}"
+        # 414fadaadb1f5c748f201216078201d4efde512b  
+        # bd500af1c0301e23e1adbc7c0bc4a943c1531ba3 
+        # de88bfcd8b64db39b0b67981a1aa297dc49f7aee
 
-
-
-
-
+        echo "jsondata: $JSONDATA"
         
+        curl -L \
+        -X POST \
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        https://api.github.com/repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/pulls/${{ github.event.pull_request.number }}/reviews \
+        -d "$JSONDATA"
+          
+        
+       
