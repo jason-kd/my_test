@@ -266,7 +266,7 @@ jobs:
       
         pwd
         # change_file_one_line="Uart/uart_console.c"
-        change_file_one_line="Uart/uart_mgr.c"
+        # change_file_one_line="Uart/uart_mgr.c"
         echo "changed file:$change_file_one_line"
 
         if [[ -z $change_file_one_line ]]; then
