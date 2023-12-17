@@ -265,8 +265,9 @@ jobs:
         read -r change_file_one_line < changed_files.txt
       
         pwd
-        # change_file="Uart/uart_console.c"
-        echo "change file:$change_file_one_line"
+        # change_file_one_line="Uart/uart_console.c"
+        change_file_one_line="Uart/uart_mgr.c"
+        echo "changed file:$change_file_one_line"
 
         if [[ -z $change_file_one_line ]]; then
           echo "no change file, then exit"
