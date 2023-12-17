@@ -232,12 +232,14 @@ jobs:
                   echo "$line"
                   if [[ !(-s "check_result.txt") ]]; then
                     echo "result_err" > check_result.txt
+                    echo "record err result"
                   fi
               fi
             done < result.xml
         fi
         
         error_code=$(cat check_result.txt)
+        echo "error is: $error_code"
         # error_code="ok"
         if [[ $error_code != "result_err" ]]; then
           echo "no error!"
