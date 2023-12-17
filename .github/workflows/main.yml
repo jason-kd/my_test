@@ -232,7 +232,7 @@ jobs:
                   echo "$line"
                   echo "result.txt is:"
                   cat check_result.txt
-                  if [[ -s "check_result.txt" && [ "$(cat file.txt)" != "" ]]; then
+                  if [[ -s "check_result.txt" && "$(cat file.txt)" != "" ]]; then
                     echo "file is not empty"
                     continue                  
                   else       
