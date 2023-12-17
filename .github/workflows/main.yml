@@ -232,7 +232,10 @@ jobs:
                   echo "$line"
                   echo "result.txt is:"
                   cat check_result.txt
-                  if [[ !(-s "check_result.txt") ]]; then
+                  if [[ -s "check_result.txt") ]]; then
+                    echo "continue"
+                    continue
+                  else
                     echo "result_err" > check_result.txt
                     echo "record err result"
                   fi
