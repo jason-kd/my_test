@@ -273,27 +273,28 @@ jobs:
           echo "no change file, then exit"
           exit 0
         fi
-
+         
+        OWNER=${{ github.repository_owner }}
+        REPO=${{ github.event.repository.name }}
+        PULL_NUMBER=${{ github.event.pull_request.number }}
         COMMIT_ID=${{ github.event.pull_request.head.sha }}
         echo "commint_id is: $COMMIT_ID"
-        echo "lastest commint_id is: ${{ github.sha }}"
 
-        JSONDATA="{\"commit_id\":\"$COMMIT_ID\",\"body\":\"cppcheck verify\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file_one_line\",\"position\":6,\"body\":\"Please fix this typo.\"}]}"
-        # JSONDATA="{\"commit_id\":\"13354072bdb8c87adcd77c2f2937671d8c76806c\",\"body\":\"cppcheck verify\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file_one_line\",\"position\":6,\"body\":\"Please fix this typo.\"}]}"
-        # JSONDATA="{\"commit_id\":\"$COMMIT_ID\",\"body\":\"cppcheck verify\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file_one_line \",\"position\":6,\"body\":\"Please fix this typo.\"}]}"
-        # 414fadaadb1f5c748f201216078201d4efde512b  
-        # bd500af1c0301e23e1adbc7c0bc4a943c1531ba3 
-        # de88bfcd8b64db39b0b67981a1aa297dc49f7aee
+        # JSONDATA="{\"body\":\"essential package check\",\"commit_id\":\"$COMMIT_ID\",\"path\":\"$change_file_one_line\",\"start_line\":1,\"start_side\":\"RIGHT\",\"line\":2,\"side\":\"RIGHT\"}"
+        JSONDATA="{\"body\":\"essential package verify\",\"commit_id\":\"$COMMIT_ID\",\"path\":\"$change_file_one_line\",\"position\":6}"
+        echo "JSONDATA: $JSONDATA"
 
-        echo "jsondata: $JSONDATA"
-        
         curl -L \
         -X POST \
         -H "Accept: application/vnd.github+json" \
         -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
         -H "X-GitHub-Api-Version: 2022-11-28" \
-        https://api.github.com/repos/${{ github.repository_owner }}/${{ github.event.repository.name }}/pulls/${{ github.event.pull_request.number }}/reviews \
-        -d "$JSONDATA"
-          
+        https://api.github.com/repos/$OWNER/$REPO/pulls/$PULL_NUMBER/comments \
+        -d "$JSONDATA"         
+         
+         
+         
+         
+         
         
        
