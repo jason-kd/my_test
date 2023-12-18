@@ -190,6 +190,8 @@ jobs:
     - name: pull_request_check
       if:  ${{ (github.event_name == 'pull_request') }}
       run: | 
+        git diff ${{ github.event.pull_request.head.sha }} > diff.txt
+        cat diff.txt
         # changed_files=$(git diff -u --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
         changed_files=$(git diff HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
         echo -e "different files is: \n$changed_files"
