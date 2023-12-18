@@ -280,7 +280,7 @@ jobs:
         COMMIT_ID=${{ github.event.pull_request.head.sha }}
         echo "commint_id is: $COMMIT_ID"
 
-        JSONDATA="{\"body\":\"essential package check\",\"commit_id\":\"$COMMIT_ID\",\"path\":\"$change_file_one_line\",\"start_line\":1,\"start_side\":\"RIGHT\",\"line\":2,\"side\":\"RIGHT\"}"
+        JSONDATA="{\"body\":\"essential package check\",\"commit_id\":\"$COMMIT_ID\",\"path\":\"$change_file_one_line\",\"start_line\":28,\"start_side\":\"RIGHT\",\"line\":28,\"side\":\"RIGHT\"}"
         # JSONDATA="{\"body\":\"essential package verify\",\"commit_id\":\"$COMMIT_ID\",\"path\":\"$change_file_one_line\",\"position\":6}"
         echo "JSONDATA: $JSONDATA"
 
