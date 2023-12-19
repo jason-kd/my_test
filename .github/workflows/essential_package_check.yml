@@ -5,72 +5,58 @@ on:
     types:
       - opened
       - synchronize
+    branches:
+      - master
 
 jobs:
-  review_job:
+  review_comment:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # 创建 Review Comment
-      - name: Create review comment
-        id: create_comment
-        uses: actions/github-script@v4
-        with:
-          script: |
-            const { context, github } = require("@actions/github");
+    - name: Create review comment
+      id: create_comment
+      uses: actions/github-script@v4
+      with:
+        script: |
+          const { context, github } = require("@actions/github");
 
-            async function run() {
-              const prNumber = context.payload.pull_request.number;
-              const repo = context.repo;
+          async function run() {
+            const prNumber = context.payload.pull_request.number;
+            const repo = context.repo;
 
-              const newComment = await github.rest.pulls.createReview({
-                ...repo,
-                pull_number: prNumber,
-                commit_id: context.payload.pull_request.head.sha,
-                event: "COMMENT",
-                body: "Review comment content"
-              });
-
-              console.log(`Comment created: ${newComment.html_url}`);
-
-              return newComment.id;
-            }
-
-            run().then(commentId => {
-              console.log(`::set-output name=comment_id::${commentId}`);
+            const newComment = await github.pulls.createReview({
+              ...repo,
+              pull_number: prNumber,
+              commit_id: context.payload.pull_request.head.sha,
+              event: "COMMENT",
+              body: "Review comment content"
             });
+
+            console.log(`Comment created: ${newComment.data.html_url}`);
+
+            return newComment.data.id;
+          }
+
+          run().then(commentId => {
+            console.log(`::set-output name=comment_id::${commentId}`);
+          })
+    
+  email_notification:
+    needs: review_comment
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
       
-      # 检查是否有已解决的对话并发送电子邮件通知
-      - name: Check resolved conversations and send email
-        uses: actions/github-script@v4
-        with:
-          script: |
-            const { context, github } = require("@actions/github");
-
-            async function run() {
-              const prNumber = context.payload.pull_request.number;
-              const repo = context.repo;
-                
-              const conversations = await github.rest.pulls.listReviews({
-                ...repo,
-                pull_number: prNumber
-              });
-
-              const resolvedConversations = conversations.filter((review) => {
-                return review.state === "APPROVED" || review.state === "CHANGES_REQUESTED";
-              });
-
-              if (resolvedConversations.length > 0) {
-                console.log("There are resolved conversations in this Pull Request.");
-                // 执行其他操作...
-              } else {
-                console.log("No resolved conversations found in this Pull Request.");
-              }          
-            }
-
-
-
-      
+    - name: Send email notification
+      run: |
+        echo "The conversation (ID: ${{ github.event.pull_request.id }}) has been resolved. Please check it out." > email.txt
+        # Replace the following line with your own email sending logic using an SMTP library or email service provider API
+        
+        cat email.txt  # For demonstration purposes only
