@@ -17,32 +17,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Create review comment
-      id: create_comment
-      uses: actions/github-script@v4
-      with:
-        script: |
-          async function run() {
-            const { github } = require("@actions/github");
-
-            const prNumber = context.payload.pull_request.number;
-            const repo = context.repo;
-
-            const newComment = await github.pulls.createReview({
-              ...repo,
-              pull_number: prNumber,
-              commit_id: context.payload.pull_request.head.sha,
-              event: "COMMENT",
-              body: "Review comment content"
-            });
-
-            console.log(`Comment created: ${newComment.data.html_url}`);
-
-            return newComment.data.id;
-          }
-
-          run().then(commentId => {
-            console.log(`::set-output name=comment_id::${commentId}`);
-          })
+      run: |
+        echo "Review comment content" > comment.txt
+        gh pr review ${{ github.event.pull_request.number }} --body "$(cat comment.txt)"
     
   email_notification:
     needs: review_comment
