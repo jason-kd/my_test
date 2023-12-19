@@ -1,8 +1,8 @@
 name: Static code analysis
 on:   
-  pull_request:
-    branches:
-      - main
+  # pull_request:
+    # branches:
+      # - main
       
   # Run workflow on on demand through UI
   workflow_dispatch:

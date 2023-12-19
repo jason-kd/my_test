@@ -1,0 +1,76 @@
+name: PR Workflow
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  review_job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # 创建 Review Comment
+      - name: Create review comment
+        id: create_comment
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const { context, github } = require("@actions/github");
+
+            async function run() {
+              const prNumber = context.payload.pull_request.number;
+              const repo = context.repo;
+
+              const newComment = await github.rest.pulls.createReview({
+                ...repo,
+                pull_number: prNumber,
+                commit_id: context.payload.pull_request.head.sha,
+                event: "COMMENT",
+                body: "Review comment content"
+              });
+
+              console.log(`Comment created: ${newComment.html_url}`);
+
+              return newComment.id;
+            }
+
+            run().then(commentId => {
+              console.log(`::set-output name=comment_id::${commentId}`);
+            });
+      
+      # 检查是否有已解决的对话并发送电子邮件通知
+      - name: Check resolved conversations and send email
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const { context, github } = require("@actions/github");
+
+            async function run() {
+              const prNumber = context.payload.pull_request.number;
+              const repo = context.repo;
+                
+              const conversations = await github.rest.pulls.listReviews({
+                ...repo,
+                pull_number: prNumber
+              });
+
+              const resolvedConversations = conversations.filter((review) => {
+                return review.state === "APPROVED" || review.state === "CHANGES_REQUESTED";
+              });
+
+              if (resolvedConversations.length > 0) {
+                console.log("There are resolved conversations in this Pull Request.");
+                // 执行其他操作...
+              } else {
+                console.log("No resolved conversations found in this Pull Request.");
+              }          
+            }
+
+
+
+      
