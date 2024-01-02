@@ -11,7 +11,7 @@ def send_email():
 
     curl_command = 'curl --url "smtps://smtp.163.com:465" --ssl-reqd \
                     --mail-from "15889671017@163.com" --mail-rcpt "jason.chen@wyze.com" \
-                    --user "15889671017@163.com:jason1982ID" --insecure \
+                    --user "15889671017@163.com:jason1982ID"  \
                     --upload-file email.txt'
 
     try:
