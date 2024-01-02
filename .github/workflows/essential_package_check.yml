@@ -16,15 +16,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up GitHub CLI
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: echo "test"
+    # - name: Set up GitHub CLI
+      # env:
+        # GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # run: echo "test"
         
-    - name: Create review comment
-      run: |
-        echo "Review comment content" > comment.txt
-        gh pr review ${{ github.event.pull_request.number }} --body "$(cat comment.txt)"
+    # - name: Create review comment
+      # run: |
+        # echo "Review comment content" > comment.txt
+        # gh pr review ${{ github.event.pull_request.number }} --body "$(cat comment.txt)"
 
     - name: Set up Python
       uses: actions/setup-python@v2
