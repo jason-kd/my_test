@@ -24,6 +24,10 @@ jobs:
       run: |
         echo "Review comment content" > comment.txt
         gh pr review ${{ github.event.pull_request.number }} --body "$(cat comment.txt)"
+
+    - name: run_py
+      run: |
+        python .github/workflows/send_mail.py
     
   email_notification:
     needs: review_comment
