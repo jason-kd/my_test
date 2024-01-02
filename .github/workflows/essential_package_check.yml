@@ -33,7 +33,7 @@ jobs:
           
     - name: run_py
       run: |
-        python .github/workflows/send_mail.py
+        python .github/workflows/send_email.py
     
   email_notification:
     needs: review_comment
