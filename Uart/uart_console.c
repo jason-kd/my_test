@@ -23,6 +23,10 @@ int file_write_test(void *p)
 	
 	as32Test[11] = 12;
 	
+	as32Test[11] = 14;
+	
+	as32Test[13] = 14;
+
 }
 
 void uart_console_task(void *arg)

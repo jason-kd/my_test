@@ -1,0 +1,13 @@
+on:
+  issue_comment:
+    types:
+      - edited
+      - created
+
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: execute python
+      run: |
+        echo "send email to someone"
