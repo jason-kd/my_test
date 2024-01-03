@@ -1,53 +1,13 @@
-name: PR Workflow
-
 on:
-  pull_request:
+  issue_comment:
     types:
-      - opened
-      - synchronize
-    branches:
-      - main
+      - edited
+      - created
 
 jobs:
-  review_comment:
+  my-job:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    # - name: Set up GitHub CLI
-      # env:
-        # GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # run: echo "test"
-        
-    # - name: Create review comment
-      # run: |
-        # echo "Review comment content" > comment.txt
-        # gh pr review ${{ github.event.pull_request.number }} --body "$(cat comment.txt)"
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-          python-version: 3.x
-          
-    - name: run_py
+    - name: execute python
       run: |
-        python .github/workflows/send_email.py
-    
-  email_notification:
-    needs: review_comment
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      
-    - name: Send email notification
-      run: |
-        echo "The conversation (ID: ${{ github.event.pull_request.id }}) has been resolved. Please check it out." > email.txt
-        # Replace the following line with your own email sending logic using an SMTP library or email service provider API
-        
-        cat email.txt  # For demonstration purposes only
+        echo "send email to someone"
