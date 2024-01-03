@@ -285,7 +285,7 @@ jobs:
         # bd500af1c0301e23e1adbc7c0bc4a943c1531ba3 
         # de88bfcd8b64db39b0b67981a1aa297dc49f7aee
 
-        echo "jsondata: $JSONDATA"
+        echo "jsondata: $JSONDATA" 
         
         curl -L \
         -X POST \
