@@ -304,7 +304,22 @@ jobs:
           -H "Authorization: token $TOKEN" \
           "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUMBER/comments")
           
-        echo $COMMENTS         
+        echo $COMMENTS        
+
+    - name: send_email
+      env:
+        REPO_OWNER: ${{ github.repository_owner }}
+        REPO_NAME: ${{ github.event.repository.name }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+        #EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      run: |    
+        echo "test-0104-v18"
+        #python .github/workflows/send_mail.py  
+        python .github/workflows/check_resolve_conversation.py    
+        env:
+          ACTIONS_STEP_DEBUG: true  # 设置调试模式以显示详细的日志信息        
          
          
          
