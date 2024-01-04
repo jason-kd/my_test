@@ -24,34 +24,20 @@ while True:
     comments_url = f'{api_url}/repos/{repo_owner}/{repo_name}/pulls/{pr_number}/comments'
     # comments_url = f'{api_url}/repos/{repo_owner}/{repo_name}/pulls/{pr_number}/reviews'
     response = requests.get(comments_url, headers=headers)
-    comments = response.json()
-    # reviews = response.json()
-    
-    print(f"Total comments: {len(comments)}")
-    sys.stdout.flush()  # 刷新标准输出缓冲区
-    
-    # 验证评论是否已解决
-    for comment in comments:
-        print(f"comment body: {comment['body']}")
-        print(f"comment state: {comment['state']}")
-        
-        if comment['state'] == 'RESOLVED':
-            print(f"Approved review found: {comment['body']}")
-            # 退出程序
-            break
+    comments = response.json()  
 
         
     # 检查评论是否有已解决标记
-    #for comment in comments:
-     #   print(f"Comment by {comment['user']['login']}: {comment['body']}")
-      #  sys.stdout.flush()  # 刷新标准输出缓冲区
+    for comment in comments:
+       print(f"Comment by {comment['user']['login']}: {comment['body']}")
+       sys.stdout.flush()  # 刷新标准输出缓冲区
         
-       # if comment['pull_request_review_id'] is not None and comment['state'] == 'RESOLVED':
+       if comment['pull_request_review_id'] is not None and comment['state'] == 'RESOLVED':
             # 执行你想要的操作或调用工作流程
-        #    print(f"Resolved comment found: {comment['body']}")
-         #   sys.stdout.flush()  # 刷新标准输出缓冲区
+           print(f"Resolved comment found: {comment['body']}")
+           sys.stdout.flush()  # 刷新标准输出缓冲区
             # 退出程序
-          #  break
+           break
 
     # 添加适当的延迟，避免频繁请求
     time.sleep(5)  # 延迟2秒后再次检测
