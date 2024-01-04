@@ -316,14 +316,14 @@ jobs:
           -H "Authorization: token $TOKEN" \
           "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUMBER/comments")
           
-        for row in $(echo "${COMMENTS}" | jq -r '.[] | @base64'); do
-          _jq() {
-            echo ${row} | base64 --decode | jq -r ${1}
-          }
-          
-          comment=$(_jq '.body')
-          echo "$comment"
-        done       
+        total_comments=$(echo "$COMMENTS" | jq length)
+        echo "Total comments: $total_comments"
+        
+        for index in $(jq 'keys[]' <<< "$COMMENTS"); do
+          comment=$(jq -r ".[$index].body" <<< "$COMMENTS")
+          comment_number=$((index+1))
+          echo "Comment #$comment_number: $comment"
+        done    
          
          
          
