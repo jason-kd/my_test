@@ -326,40 +326,24 @@ jobs:
         done    
 
          # #
-        echo "an test"
-        QUERY=$(cat <<EOF
-        {
-          repository(owner: "$REPO_OWNER", name: "$REPO_NAME") {
-            pullRequest(number: $PR_NUMBER) {
-              comments(first: 100) {
-                nodes {
-                  body
-                  isResolved
-                }
-              }
-            }
-          }
-        }
-        EOF
-        )
+        echo "another test"
+        resolved=false
         
-        RESPONSE=$(curl -s -X POST \
-          -H "Authorization: bearer $TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -d "$QUERY" \
-          "https://api.github.com/graphql")
-          
-        for row in $(echo "$RESPONSE" | jq -r '.data.repository.pullRequest.comments.nodes[] | @base64'); do
-          _jq() {
-            echo ${row} | base64 --decode | jq -r ${1}
+        for event_row in $(echo "$events" | jq -r '.[] | @base64'); do
+          _event_jq() {
+            echo ${event_row} | base64 --decode | jq -r ${1}
           }
           
-          comment=$(_jq '.body')
-          resolved=$(_jq '.isResolved')
-          
-          echo "Comment: $comment"
-          echo "Resolved: $resolved"
-        done         
+          if [ "$(_event_jq '.event')" == "resolved" ]; then
+            resolved=true
+            break
+          fi
+        done
+  
+        comment=$(_jq '.body')
+        echo "Comment: $comment"
+        echo "Resolved: $resolved"
+        done    
          
          
         
