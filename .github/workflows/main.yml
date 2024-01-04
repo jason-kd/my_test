@@ -324,8 +324,42 @@ jobs:
           comment_number=$((index+1))
           echo "Comment #$comment_number: $comment"
         done    
-         
-         
+
+         # #
+        echo "an test"
+        QUERY=$(cat <<EOF
+        {
+          repository(owner: "$REPO_OWNER", name: "$REPO_NAME") {
+            pullRequest(number: $PR_NUMBER) {
+              comments(first: 100) {
+                nodes {
+                  body
+                  isResolved
+                }
+              }
+            }
+          }
+        }
+        EOF
+        )
+        
+        RESPONSE=$(curl -s -X POST \
+          -H "Authorization: bearer $TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          -d "$QUERY" \
+          "https://api.github.com/graphql")
+          
+        for row in $(echo "$RESPONSE" | jq -r '.data.repository.pullRequest.comments.nodes[] | @base64'); do
+          _jq() {
+            echo ${row} | base64 --decode | jq -r ${1}
+          }
+          
+          comment=$(_jq '.body')
+          resolved=$(_jq '.isResolved')
+          
+          echo "Comment: $comment"
+          echo "Resolved: $resolved"
+        done         
          
          
         
