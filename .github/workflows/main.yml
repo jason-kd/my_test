@@ -295,19 +295,16 @@ jobs:
         https://api.github.com/repos/$OWNER/$REPO/pulls/$PULL_NUMBER/comments \
         -d "$JSONDATA"         
          
-    - name: Create Single Comment
-      run: |
         TOKEN=${{ secrets.GITHUB_TOKEN }}  # 将您的GitHub访问令牌存储在名为TOKEN的环境变量中
         REPO_OWNER=${{ github.repository_owner }}  # 替换为您的仓库所有者用户名或组织名称
         REPO_NAME=${{ github.event.repository.name }}  # 替换为您的仓库名称
         PR_NUMBER=${{ github.event.pull_request.number }}  # 替换为PR的编号
         
-        COMMENT=$(curl -X POST \
+        COMMENTS=$(curl -s -X GET \
           -H "Authorization: token $TOKEN" \
-          -d '{"body": "Your comment here"}' \
           "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUMBER/comments")
           
-        echo $COMMENT
+        echo $COMMENTS         
          
          
          
