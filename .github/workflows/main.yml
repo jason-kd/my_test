@@ -326,7 +326,7 @@ jobs:
         done    
 
          # #
-        echo "another test"
+        echo "another test-1"
         for row in $(echo "$COMMENTS" | jq -r '.[] | @base64'); do
           _jq() {
             echo ${row} | base64 --decode | jq -r ${1}
