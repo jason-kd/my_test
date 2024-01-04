@@ -32,12 +32,12 @@ while True:
        print(f"Comment by {comment['user']['login']}: {comment['body']}")
        sys.stdout.flush()  # 刷新标准输出缓冲区
         
-       if comment['pull_request_review_id'] is not None and comment['state'] == 'RESOLVED':
+       #if comment['pull_request_review_id'] is not None and comment['state'] == 'RESOLVED':
             # 执行你想要的操作或调用工作流程
-           print(f"Resolved comment found: {comment['body']}")
-           sys.stdout.flush()  # 刷新标准输出缓冲区
+           #print(f"Resolved comment found: {comment['body']}")
+           #sys.stdout.flush()  # 刷新标准输出缓冲区
             # 退出程序
-           break
+           #break
 
     # 添加适当的延迟，避免频繁请求
     time.sleep(5)  # 延迟2秒后再次检测
