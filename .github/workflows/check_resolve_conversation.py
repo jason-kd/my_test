@@ -29,7 +29,8 @@ while True:
         
     # 检查评论是否有已解决标记
     for comment in comments:
-       print(f"Comment by {comment['user']['login']}: {comment['body']}")
+       print(f"Comment by {comment['user']['login']}: {comment['body']} : review id: {comment['pull_request_review_id']} ")
+          
        sys.stdout.flush()  # 刷新标准输出缓冲区
         
        #if comment['pull_request_review_id'] is not None and comment['state'] == 'RESOLVED':
