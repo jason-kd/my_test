@@ -314,7 +314,7 @@ jobs:
         
         COMMENTS=$(curl -s -X GET \
           -H "Authorization: token $TOKEN" \
-          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues/$PR_NUMBER/comments")
+          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments")
           
         total_comments=$(echo "$COMMENTS" | jq length)
         echo "Total comments: $total_comments"
