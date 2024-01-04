@@ -327,23 +327,33 @@ jobs:
 
          # #
         echo "another test"
-        resolved=false
-        
-        for event_row in $(echo "$events" | jq -r '.[] | @base64'); do
-          _event_jq() {
-            echo ${event_row} | base64 --decode | jq -r ${1}
+        for row in $(echo "$COMMENTS" | jq -r '.[] | @base64'); do
+          _jq() {
+            echo ${row} | base64 --decode | jq -r ${1}
           }
+    
+          comment_id=$(_jq '.id')
+          events=$(curl -s -X GET \
+            -H "Authorization: token $TOKEN" \
+            "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/pulls/comments/$comment_id/events")
           
-          if [ "$(_event_jq '.event')" == "resolved" ]; then
-            resolved=true
-            break
-          fi
-        done
-  
-        comment=$(_jq '.body')
-        echo "Comment: $comment"
-        echo "Resolved: $resolved"
-        done    
+          resolved=false
+          
+          for event_row in $(echo "$events" | jq -r '.[] | @base64'); do
+            _event_jq() {
+              echo ${event_row} | base64 --decode | jq -r ${1}
+            }
+            
+            if [ "$(_event_jq '.event')" == "resolved" ]; then
+              resolved=true
+              break
+            fi
+          done
+    
+          comment=$(_jq '.body')
+          echo "Comment: $comment"
+          echo "Resolved: $resolved"
+        done  
          
          
         
