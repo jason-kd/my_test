@@ -169,7 +169,7 @@ jobs:
     - name: cppcheck different files
       if: ${{ (github.event_name == 'workflow_dispatch') && (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3' || github.event.inputs.product_name == 'V4' || github.event.inputs.product_name == 'Floodlight cam v2' || github.event.inputs.product_name == 'Doorbell v2') && (github.event.inputs.check_type == 'Different') }}
       run: |  
-        changed_files=$(git diff --name-only HEAD origin/master | grep -E '\.(c|cpp|cc|cxx)$' || true)
+        changed_files=$(git diff --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
         echo "different files is: $changed_files"
         echo "diff" > check_type.txt
         enalbe_param=$(cat enalbe_param.txt)
