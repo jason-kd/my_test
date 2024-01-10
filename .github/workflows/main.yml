@@ -192,9 +192,10 @@ jobs:
       run: | 
         git diff ${{ github.event.pull_request.head.sha }} > diff.txt
         cat diff.txt
-        # changed_files=$(git diff -u --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
-        changed_files=$(git diff HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
-        echo -e "different files is: \n$changed_files"
+        changed_files=$(git diff -u --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
+        # changed_files=$(git diff HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
+        echo "different files is:"
+        echo "$changed_files"
         echo "diff" > check_type.txt
         echo "$changed_files" > changed_files.txt
         
