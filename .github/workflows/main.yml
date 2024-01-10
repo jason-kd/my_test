@@ -192,7 +192,7 @@ jobs:
       run: | 
         git diff ${{ github.event.pull_request.head.sha }} > diff.txt
         cat diff.txt
-        changed_files=$(git diff -u --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
+        changed_files=$(git diff -u --name-only HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true | head -n 1)
         # changed_files=$(git diff HEAD origin/main | grep -E '\.(c|cpp|cc|cxx)$' || true)
         echo "different files is:"
         echo "$changed_files"
@@ -269,7 +269,7 @@ jobs:
         read -r change_file_one_line < changed_files.txt
       
         pwd
-        change_file_one_line="Uart/uart_console.c"
+        # change_file_one_line="Uart/uart_console.c"
         # change_file_one_line="Uart/uart_mgr.c"
         echo "changed file:$change_file_one_line"
 
