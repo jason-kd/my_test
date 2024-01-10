@@ -298,7 +298,7 @@ jobs:
         #comment         
 
         #review comment 
-        JSONDATA=-d "{\"commit_id\":\"ecdd80bb57125d7ba9641ffaa4d7d2c19d3f3091\",\"body\":\"change.\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"file.md\",\"position\":1,\"body\":\"typo.\"}]}"
+        JSONDATA=-d "{\"commit_id\":\"$COMMIT_ID\",\"body\":\"change.\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file_one_line\",\"position\":1,\"body\":\"typo.\"}]}"
         echo "JSONDATA: $JSONDATA"
 
         curl -L \
