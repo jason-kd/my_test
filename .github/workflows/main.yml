@@ -300,7 +300,7 @@ jobs:
         #comment         
 
         #review comment 
-        JSONDATA=-d "{\"commit_id\":\"$COMMIT_ID\",\"body\":\"change.\",\"event\":\"REQUEST_CHANGES\",\"comments\":[{\"path\":\"$change_file_one_line\",\"position\":1,\"body\":\"typo.\"}]}"
+        JSONDATA=-d "{\"commit_id\":\"$COMMIT_ID\",\"body\":\"change.\",\"event\":\"COMMENT\",\"comments\":[{\"path\":\"$change_file_one_line\",\"position\":1,\"body\":\"typo.\"}]}"
         echo "JSONDATA: $JSONDATA"
 
         curl -L \
