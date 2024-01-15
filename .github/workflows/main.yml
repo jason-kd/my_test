@@ -347,7 +347,7 @@ jobs:
          
     - name: cross commit check
       run: |  
-        python .github/workflows/cross_commit_check.py ${{ env.REPO_OWNER }} ${{ env.REPO_NAME }} ${{ env.PR_NUMBER }}
+        python .github/workflows/cross_commit_check.py ${{ env.REPO_OWNER }} ${{ env.REPO_NAME }} ${{ env.PR_NUMBER }} 
 
 
       
