@@ -335,6 +335,7 @@ jobs:
 
         #EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
         #EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        ACTIONS_STEP_DEBUG: true  # 设置调试模式以显示详细的日志信息   
       run: |    
         echo "test-0104-v18"
         echo "REPO_OWNER:${{ env.REPO_OWNER }}"
@@ -342,8 +343,7 @@ jobs:
         echo "REPO_NAME:${{ env.PR_NUMBER }}"
         #python .github/workflows/send_mail.py  
         # python .github/workflows/check_resolve_conversation.py    
-        env:
-          ACTIONS_STEP_DEBUG: true  # 设置调试模式以显示详细的日志信息        
+     
          
     - name: cross commit check
       run: |  
