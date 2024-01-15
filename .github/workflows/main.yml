@@ -304,27 +304,17 @@ jobs:
         #comment         
 
         #review comment 
-        JSONDATA=-d "{\"commit_id\":\"$COMMIT_ID\",\"body\":\"change.\",\"event\":\"COMMENT\",\"comments\":[{\"path\":\"$change_file_one_line\",\"position\":1,\"body\":\"typo.\"}]}"
-        echo "JSONDATA: $JSONDATA"
+        # JSONDATA=-d "{\"commit_id\":\"$COMMIT_ID\",\"body\":\"change.\",\"event\":\"COMMENT\",\"comments\":[{\"path\":\"$change_file_one_line\",\"position\":1,\"body\":\"typo.\"}]}"
+        # echo "JSONDATA: $JSONDATA"
 
-        curl -L \
-        -X POST \
-        -H "Accept: application/vnd.github+json" \
-        -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-        -H "X-GitHub-Api-Version: 2022-11-28" \
-        https://api.github.com/repos/jason-kd/my_test/pulls/18/comments \
-        -d "$JSONDATA" 
-
-    - name: Install jq
-      run: |
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-          sudo apt-get install -y jq
-        elif [[ "$OSTYPE" == "darwin"* ]]; then
-          brew install jq
-        else
-          echo "Unsupported operating system: $OSTYPE"
-          exit 1
-        fi      
+        # curl -L \
+        # -X POST \
+        # -H "Accept: application/vnd.github+json" \
+        # -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+        # -H "X-GitHub-Api-Version: 2022-11-28" \
+        # https://api.github.com/repos/jason-kd/my_test/pulls/18/comments \
+        # -d "$JSONDATA" 
+        
     - name: display comments
       run: |     
         TOKEN=${{ secrets.GITHUB_TOKEN }}  # 将您的GitHub访问令牌存储在名为TOKEN的环境变量中
@@ -345,6 +335,7 @@ jobs:
 
         #EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
         #EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        ACTIONS_STEP_DEBUG: true  # 设置调试模式以显示详细的日志信息   
       run: |    
         echo "test-0104-v18"
         echo "REPO_OWNER:${{ env.REPO_OWNER }}"
@@ -352,8 +343,7 @@ jobs:
         echo "REPO_NAME:${{ env.PR_NUMBER }}"
         #python .github/workflows/send_mail.py  
         # python .github/workflows/check_resolve_conversation.py    
-        env:
-          ACTIONS_STEP_DEBUG: true  # 设置调试模式以显示详细的日志信息        
+     
          
     - name: cross commit check
       run: |  
