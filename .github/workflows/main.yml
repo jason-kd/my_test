@@ -71,7 +71,7 @@ on:
 jobs:
   scancode_job:
     # Run on hosted VM provided by GitHub
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Static code analysis
     steps:
     - uses: actions/checkout@v4
@@ -218,7 +218,7 @@ jobs:
         
     - name: Upload v3_cppcheck_result artifacts
       if: ${{ (github.event_name != 'workflow_dispatch') || (github.event.inputs.product_name == 'All' || github.event.inputs.product_name == 'V3' || github.event.inputs.product_name == 'V4' || github.event.inputs.product_name == 'Floodlight cam v2' || github.event.inputs.product_name == 'Doorbell v2') }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
           name: v3_cppcheck_result
           path: |
